@@ -1,0 +1,457 @@
+Software Design Document (SDD)
+Kenduri Kahwin RSVP PWA Web App
+
+Project Name: KenduriAmpang RSVP
+ Event: Majlis Perkahwinan Anak Saudara (Ampang, Selangor)
+ Version: 1.0
+ Prepared For: Family Wedding Organizing Committee
+ Prepared By: Software Design Team
+
+1. Executive Summary
+
+KenduriAmpang RSVP is a Progressive Web Application (PWA) designed to simplify guest invitation management for a Malaysian wedding reception. The application enables invited guests to confirm attendance, indicate the number of attendees, select meal preferences, obtain location directions, and receive event updates.
+
+The application will be mobile-first because most guests will access the invitation through WhatsApp. Guests can install the web app directly onto their Android or iPhone home screens without needing Google Play Store or Apple App Store publication.
+
+2. Objectives
+Business Objectives
+Replace manual RSVP collection via WhatsApp.
+Reduce uncertainty in catering headcount.
+Track attendance by invitation group.
+Simplify communication with guests.
+Support event planning and reporting.
+User Objectives
+
+Guests should be able to:
+
+View wedding invitation.
+Confirm attendance in less than 1 minute.
+Update RSVP before deadline.
+View venue location via Google Maps/Waze.
+Add event to personal calendar.
+3. Scope
+In Scope
+Guest Features
+Digital invitation page
+RSVP submission
+Attendance confirmation
+Number of attendees
+Dietary requirements
+Venue information
+Google Maps integration
+Add to Calendar
+Contact organizers
+Admin Features
+Dashboard
+RSVP tracking
+Attendance statistics
+Guest list management
+Export RSVP data to Excel
+WhatsApp reminder generation
+Out of Scope
+Online payment
+E-wallet gifts
+Live streaming
+Seating optimization (Phase 2)
+4. User Roles
+4.1 Guest
+
+Family members, relatives, friends, colleagues.
+
+Permissions:
+
+View invitation
+Submit RSVP
+Edit RSVP
+View location
+4.2 Wedding Administrator
+
+Usually bride/groom family representative.
+
+Permissions:
+
+Create invitations
+Manage guests
+Monitor RSVPs
+Export reports
+Send reminders
+5. High-Level Architecture
++----------------------+
+|      Guest PWA       |
+|   (Mobile Browser)   |
++----------+-----------+
+           |
+           HTTPS
+           |
++----------v-----------+
+|     REST API         |
+|  Node.js / NestJS    |
++----------+-----------+
+           |
++----------v-----------+
+|     PostgreSQL       |
++----------------------+
+
+
+Optional services:
+
+Google Maps API
+WhatsApp Click-to-Chat
+Firebase Cloud Messaging
+
+6. Technology Stack
+Frontend
+Component	TechnologyUI Framework	React
+Meta Framework	Next.js
+Styling	Tailwind CSS
+PWA	next-pwa
+Forms	React Hook Form
+State Mgmt	Zustand
+Backend
+Component	TechnologyRuntime	Node.js
+Framework	NestJS
+ORM	Prisma
+API	REST
+Database
+Component	TechnologyDatabase	PostgreSQL
+Hosting	Supabase
+Deployment
+Item	PlatformFrontend	Vercel
+Backend	Railway
+Database	Supabase
+
+Estimated monthly operating cost:
+
+Item	CostVercel Hobby	RM0
+Supabase Free	RM0
+Railway Starter	RM20-40
+Total	RM0-40/month
+7. Functional Requirements
+FR-001 View Invitation
+Description
+
+Guest opens invitation link from WhatsApp.
+
+Inputs
+
+Invitation URL
+
+Example:
+
+https://kenduriampang.my/invite/ABCD123
+
+Outputs
+
+Invitation details displayed.
+
+Acceptance Criteria
+Opens within 3 sec
+Mobile responsive
+Works offline after first visit
+FR-002 RSVP Submission
+Description
+
+Guest confirms attendance.
+
+Input Fields
+Field	TypeName	Text
+Phone	Phone
+Attendance	Yes/No
+Number of Guests	Number
+Dietary Notes	Text
+Validation
+Name required
+Phone required
+Guests count ≥ 1
+FR-003 RSVP Update
+
+Guest can modify attendance before RSVP closing date.
+
+FR-004 Venue Navigation
+Description
+
+Provide navigation options.
+
+Options:
+
+Google Maps
+Waze
+
+Example:
+
+Majlis Perkahwinan
+Dewan Komuniti Ampang Jaya
+Ampang, Selangor
+
+
+Buttons:
+
+Open Google Maps
+Open Waze
+
+FR-005 Add To Calendar
+
+Generate:
+
+Google Calendar
+Apple Calendar
+Outlook Calendar
+FR-006 WhatsApp Contact
+
+Example:
+
+Pihak Pengantin:
++60 12-3456789
+
+
+Button:
+
+WhatsApp Organizer
+
+FR-007 Admin Dashboard
+
+Display:
+
+Total Invitations
+Confirmed Attendance
+Declined
+Pending RSVP
+
+KPIs:
+
+Total Guests: 500
+Confirmed: 312
+Pending: 150
+Declined: 38
+
+FR-008 Export Attendance
+
+Admin downloads:
+
+attendance.xlsx
+
+
+Fields:
+
+Name
+Phone
+Attendance
+Number of Guests
+RSVP Date
+8. Non-Functional Requirements
+Performance
+First load < 3 sec
+Dashboard load < 2 sec
+Availability
+99% uptime
+Security
+HTTPS only
+Input validation
+Anti-spam protection
+Rate limiting
+Accessibility
+WCAG 2.1 AA compliance
+Large touch targets
+9. Database Design
+Table: Event
+Event
+-----
+id
+title
+event_date
+venue
+google_maps_url
+waze_url
+rsvp_deadline
+
+Table: Guest
+Guest
+-----
+id
+name
+phone
+invitation_code
+family_group
+created_at
+
+Table: RSVP
+RSVP
+----
+id
+guest_id
+attending
+pax_count
+dietary_notes
+submitted_at
+
+Entity Relationship Diagram
+Event
+  |
+  | 1
+  |
+  | N
+RSVP
+  |
+  | N
+  |
+  | 1
+Guest
+
+10. User Interface Design
+Landing Page
++--------------------------------+
+|     Bismillahirrahmanirrahim   |
+|                                |
+|       Wedding Invitation       |
+|                                |
+|   Ahmad ❤️ Nurul               |
+|                                |
+|  21 February 2027             |
+|                                |
+|      [ Confirm RSVP ]          |
++--------------------------------+
+
+RSVP Form
+----------------------------------
+Name:
+[_____________________]
+
+Phone:
+[_____________________]
+
+Will Attend?
+
+(O) Yes
+(O) No
+
+Number of Guests:
+[ 2 ]
+
+Notes:
+[_____________________]
+
+[ Submit RSVP ]
+----------------------------------
+
+Attendance Success Screen
+✅ Thank You
+
+Your RSVP has been recorded.
+
+Attendance:
+YES
+
+Guests:
+4
+
+See you at the wedding.
+
+11. PWA Features
+Offline Support
+
+Cache:
+
+Invitation page
+Images
+Assets
+Benefits
+Fast loading
+Low bandwidth use
+Better experience in rural areas
+Home Screen Install
+
+Android:
+
+Add to Home Screen
+
+
+iPhone:
+
+Share → Add to Home Screen
+
+Push Notifications (Optional)
+
+Examples:
+
+Reminder:
+Majlis berlangsung esok.
+
+10:00 pagi
+Dewan Komuniti Ampang Jaya
+
+12. API Design
+Submit RSVP
+POST /api/rsvp
+
+
+Request:
+
+{
+  "guestId": 1,
+  "attending": true,
+  "paxCount": 4,
+  "notes": "Vegetarian"
+}
+
+
+Response:
+
+{
+  "success": true,
+  "message": "RSVP Recorded"
+}
+
+Dashboard Summary
+GET /api/dashboard
+
+
+Response:
+
+{
+  "invited": 500,
+  "confirmed": 312,
+  "declined": 38,
+  "pending": 150
+}
+
+13. Future Enhancements (Phase 2)
+QR Attendance Check-In
+
+Guest receives QR code.
+
+At hall entrance:
+
+Scan QR
+→ Attendance Recorded
+
+Table Assignment
+Table A5
+Seat 4
+
+Digital Guestbook
+
+Guests leave wishes.
+
+e-Angpow
+
+DuitNow QR integration.
+
+14. Success Metrics
+Metric	TargetRSVP Response Rate	>80%
+RSVP Completion Time	<1 min
+Mobile Usage	>95%
+Admin Time Savings	>50%
+Install Rate	>20%
+Recommended MVP for Your Nephew's/Niece's Wedding in Ampang
+
+For a real family wedding, I would build only:
+
+✅ Digital Invitation
+ ✅ RSVP Form
+ ✅ Guest Count Tracking
+ ✅ Google Maps/Waze
+ ✅ WhatsApp Contact
+ ✅ Admin Dashboard
+ ✅ Excel Export
+
+Skip QR check-in and e-Angpow initially. This MVP can be built in 1-2 weeks, hosted almost free on Vercel + Supabase, and is sufficient for managing 100-1000 wedding guests through WhatsApp invitation links.
